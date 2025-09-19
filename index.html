@@ -109,6 +109,25 @@
             max-width: 80vw;
             margin-bottom: 3vh;
         }
+        
+        .instructions {
+            background: rgba(45, 52, 54, 0.08);
+            padding: 1.5vh 3vw;
+            border-radius: 15px;
+            margin-top: -2vh; /* Ajuste para acercarlo */
+            margin-bottom: 2vh;
+        }
+
+        .instructions p {
+            font-size: calc(1.5vw + 1.5vh);
+            line-height: 1.3;
+            margin: 0;
+        }
+        
+        .instructions strong {
+            font-family: var(--font-title);
+            letter-spacing: 1px;
+        }
 
         .button {
             background: var(--secondary-bg);
@@ -253,6 +272,10 @@
         </div>
         <h1>Pugs sin Fronteras</h1>
         <p>¡Ayudá a Buddy y Pablo a recolectar todos sus pasaportes para su próximo viaje!</p>
+        <div class="instructions">
+            <p><strong>Cómo Jugar:</strong></p>
+            <p>Desliza hacia arriba para saltar.<br>¡Desliza de nuevo en el aire para un doble salto!</p>
+        </div>
         <h2>Elegí tu personaje:</h2>
         <div class="character-selection">
             <div class="char-card selected" id="char-buddy">
@@ -467,7 +490,7 @@
                         w: canvas.width * (Math.random() * 0.35 + 0.30),
                         h: canvas.height * 0.03,
                         x: lastPlatform ? lastPlatform.x + lastPlatform.w + (Math.random() * (maxGap - minGap) + minGap) : canvas.width,
-                        y: canvas.height * (Math.random() * 0.4 + 0.45) // Subidas: Rango anterior era 0.55 a 0.95
+                        y: canvas.height * (Math.random() * 0.35 + 0.40) // Rango subido
                     };
                     platforms.push(newPlatform);
                     generateCollectible(newPlatform);
@@ -649,7 +672,7 @@
 
             function resetGame() {
                 player = playerInitialState();
-                platforms = [{ x: 0, y: canvas.height * 0.7, w: canvas.width * 1.2, h: canvas.height * 0.3 }]; // Plataforma inicial más alta
+                platforms = [{ x: 0, y: canvas.height * 0.65, w: canvas.width * 1.2, h: canvas.height * 0.35 }]; // Plataforma inicial más alta
                 collectibles = [];
                 collectedItems.clear();
                 score = 0;
@@ -705,6 +728,5 @@
     </script>
 </body>
 </html>
-
 
 
