@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pugs sin Fronteras</title>
+    <script>
+        // Solución para las rutas en GitHub Pages
+        const pathSegments = window.location.pathname.split('/');
+        const repoName = pathSegments[1];
+        if (repoName && window.location.hostname.includes('github.io')) {
+            const base = document.createElement('base');
+            base.href = `/${repoName}/`;
+            document.head.prepend(base);
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Righteous&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg: #e9e1d5; /* Un beige claro y moderno */
+            --secondary-bg: #75aadb; /* Celeste bandera */
+            --accent-color: #f9c74f; /* Un amarillo sol vibrante */
+            --text-dark: #2d3436; /* Gris oscuro, casi negro */
+            --text-light: #ffffff;
+            --font-title: 'Righteous', cursive;
+            --font-body: 'Lato', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #f5f0e8, #e9e1d5); /* Degradado sutil de beige */
+            font-family: var(--font-body);
+            color: var(--text-dark);
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2vh 5vw;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        
+        #start-screen {
+            justify-content: space-evenly; /* Mejor distribución vertical */
+            overflow: hidden; /* Para los íconos decorativos */
+        }
+        
+        .emoji-background span {
+            position: absolute;
+            font-size: clamp(3rem, 10vw, 6rem);
+            opacity: 0.15;
+            animation: float 20s ease-in-out infinite;
+            user-select: none;
+        }
+
+        .emoji-background span:nth-child(1) { top: 10%; left: 5%; transform: rotate(-15deg); animation-duration: 15s; }
+        .emoji-background span:nth-child(2) { top: 20%; left: 80%; transform: rotate(10deg); animation-duration: 22s; }
+        .emoji-background span:nth-child(3) { top: 70%; left: 10%; transform: rotate(5deg); animation-duration: 18s; }
+        .emoji-background span:nth-child(4) { top: 80%; left: 75%; transform: rotate(-20deg); animation-duration: 25s; }
+        .emoji-background span:nth-child(5) { top: 40%; left: 50%; transform: rotate(15deg); animation-duration: 16s; }
+        .emoji-background span:nth-child(6) { top: 5%; left: 40%; transform: rotate(-5deg); animation-duration: 20s; }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(var(--initial-rotate, 0deg)); }
+            50% { transform: translateY(-25px) rotate(calc(var(--initial-rotate, 0deg) + 10deg)); }
+            100% { transform: translateY(0px) rotate(var(--initial-rotate, 0deg)); }
+        }
+
+        .hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        h1 {
+            font-family: var(--font-title);
+            font-size: clamp(3.5rem, 20vw, 8rem);
+            line-height: 0.9;
+            margin-bottom: 2vh;
+            color: var(--text-dark);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            transform: rotate(-2.5deg);
+        }
+
+        h2 {
+            font-size: calc(2.5vw + 2.5vh);
+            margin-bottom: 2vh;
+        }
+
+        p {
+            font-size: calc(1.8vw + 1.8vh);
+            max-width: 80vw;
+            margin-bottom: 3vh;
+        }
+
+        .button {
+            background: var(--secondary-bg);
+            color: var(--text-light);
+            border: none;
+            padding: 2vh 4vw;
+            border-radius: 50px;
+            font-size: calc(2vw + 2vh);
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+            border: 3px solid var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .button .icon {
+            display: inline-block;
+            margin-left: 15px;
+            transition: transform 0.3s ease-out;
+        }
+
+        .button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            background-color: var(--accent-color);
+            color: var(--text-dark);
+            border-color: var(--text-dark);
+        }
+        
+        .button:hover .icon {
+            transform: translateX(8px) rotate(15deg);
+        }
+
+        #start-screen .character-selection {
+            display: flex;
+            gap: 5vw;
+            margin-top: 3vh;
+        }
+
+        .char-card {
+            background: rgba(255, 255, 255, 0.7);
+            padding: 2vh 2vw;
+            border-radius: 20px;
+            cursor: pointer;
+            border: 5px solid transparent;
+            transition: border-color 0.3s, transform 0.3s;
+        }
+        
+        .char-card:hover {
+            transform: translateY(-5px) scale(1.05);
+        }
+        
+        .char-card.selected {
+            border-color: var(--secondary-bg);
+        }
+
+        .char-card img {
+            width: 25vw;
+            max-width: 180px;
+            height: auto;
+        }
+
+        #ui-layer {
+            position: absolute;
+            bottom: 5vh; /* Subido desde el borde inferior */
+            left: 0;
+            width: 100%;
+            padding: 2vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #collectibles-display {
+             background-color: rgba(255, 255, 255, 0.8);
+             padding: 1vh 2vw;
+             border-radius: 10px;
+             border: 2px solid rgba(0,0,0,0.1);
+            display: flex;
+            gap: 1vw;
+        }
+
+        #collectibles-display img {
+            width: calc(10vw + 10vh);
+            max-height: 50px;
+            height: auto;
+            opacity: 0.3;
+        }
+        #collectibles-display img.collected {
+            opacity: 1;
+        }
+
+        #game-over-screen {
+            background: linear-gradient(to bottom, #5a6268, #343a40);
+            color: var(--text-light);
+        }
+        #game-over-screen h1, #game-over-screen p {
+            color: var(--text-light);
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+
+        #win-screen {
+            background: linear-gradient(to bottom, #ffd97d, #f9c74f);
+        }
+
+        #win-screen .calendar-container {
+            margin-top: 3vh;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 2vh 3vw;
+            border-radius: 15px;
+            display: flex;
+            gap: 2vw;
+            align-items: center;
+        }
+        
+        #win-screen select, #win-screen .button {
+            padding: 1.5vh 1.5vw;
+            font-size: calc(1.2vw + 1.2vh);
+            border-radius: 10px;
+            border: 2px solid var(--text-dark);
+            background: var(--text-light);
+            color: var(--text-dark);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Pantalla de Inicio -->
+    <div id="start-screen" class="screen">
+        <div class="emoji-background">
+            <span>✈️</span>
+            <span>🌍</span>
+            <span>🐾</span>
+            <span>🦴</span>
+            <span>🧳</span>
+            <span>🗺️</span>
+        </div>
+        <h1>Pugs sin Fronteras</h1>
+        <p>¡Ayudá a Buddy y Pablo a recolectar todos sus pasaportes para su próximo viaje!</p>
+        <h2>Elegí tu personaje:</h2>
+        <div class="character-selection">
+            <div class="char-card selected" id="char-buddy">
+                <img src="assets/buddy.png" alt="Personaje Buddy" >
+                <p>Buddy</p>
+            </div>
+            <div class="char-card" id="char-pablo">
+                <img src="assets/pablo.png" alt="Personaje Pablo" >
+                <p>Pablo</p>
+            </div>
+        </div>
+        <button id="start-button" class="button" style="margin-top: 4vh;">Empezar a Jugar <span class="icon">✈️</span></button>
+    </div>
+
+    <!-- Contenedor del Juego -->
+    <div id="game-container" class="screen hidden">
+        <canvas id="game-canvas"></canvas>
+        <div id="ui-layer">
+            <div id="collectibles-display">
+                <!-- Las imágenes se agregarán dinámicamente con JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Pantalla de Game Over -->
+    <div id="game-over-screen" class="screen hidden">
+        <h1>¡Viaje Cancelado!</h1>
+        <p>¡Se te escapó un pasaporte! ¿Lo intentás de nuevo?</p>
+        <button id="restart-button" class="button">Volver a Jugar</button>
+    </div>
+    
+    <!-- Pantalla de Victoria -->
+    <div id="win-screen" class="screen hidden">
+        <h1>¡Buen Viaje!</h1>
+        <p>¡Conseguiste todos los pasaportes! Ahora que los pugs pueden viajar, ¡es tu turno de celebrar! Te ganaste un premio: una salida a un bar con el creador del juego.</p>
+        <h2>Elegí la fecha para tu premio:</h2>
+        <div class="calendar-container">
+            <select id="day-select"></select>
+            <select id="month-select"></select>
+            <select id="year-select"></select>
+            <button id="confirm-date-button" class="button">Confirmar</button>
+        </div>
+        <p id="confirmation-message" style="margin-top: 2vh; font-weight: bold;"></p>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Elementos del DOM
+            const startScreen = document.getElementById('start-screen');
+            const gameContainer = document.getElementById('game-container');
+            const gameOverScreen = document.getElementById('game-over-screen');
+            const winScreen = document.getElementById('win-screen');
+
+            const startButton = document.getElementById('start-button');
+            const restartButton = document.getElementById('restart-button');
+            const charBuddy = document.getElementById('char-buddy');
+            const charPablo = document.getElementById('char-pablo');
+
+            const canvas = document.getElementById('game-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            const collectiblesDisplay = document.getElementById('collectibles-display');
+
+            // Estado del juego
+            let gameState = 'start';
+            let selectedCharacter = 'Buddy';
+            let score = 0;
+            let gameSpeed = 0;
+            let frameCount = 0;
+
+            // Recursos de imágenes (con rutas relativas simples y nombres en minúsculas)
+            const assetPaths = {
+                playerFrames: [
+                    'assets/pug1.png', 'assets/pug2.png', 'assets/pug3.png',
+                    'assets/pug4.png', 'assets/pug5.png', 'assets/pug6.png'
+                ],
+                collectibles: {
+                    arg: 'assets/arg.png',
+                    ita: 'assets/ita.png',
+                    usa: 'assets/usa.png',
+                    esp: 'assets/esp.png'
+                },
+                characters: {
+                    Buddy: 'assets/buddy.png',
+                    Pablo: 'assets/pablo.png'
+                }
+            };
+            const assets = {
+                playerFrames: [],
+                collectibles: {},
+                characters: {}
+            };
+            let assetsLoaded = 0;
+            let totalAssets = assetPaths.playerFrames.length + Object.keys(assetPaths.collectibles).length + Object.keys(assetPaths.characters).length;
+
+            function loadAssets() {
+                const errorHandler = (img, path) => {
+                    console.error(`ERROR AL CARGAR IMAGEN: "${path}". Revisa que el nombre del archivo (incluyendo mayúsculas/minúsculas) sea correcto.`);
+                    img.placeholder = true;
+                    onAssetLoad();
+                };
+
+                assetPaths.playerFrames.forEach(path => {
+                    const img = new Image();
+                    img.src = path;
+                    img.onload = onAssetLoad;
+                    img.onerror = () => errorHandler(img, path);
+                    assets.playerFrames.push(img);
+                });
+
+                for (const key in assetPaths.collectibles) {
+                    const path = assetPaths.collectibles[key];
+                    const img = new Image();
+                    img.src = path;
+                    img.onload = onAssetLoad;
+                    img.onerror = () => errorHandler(img, path);
+                    assets.collectibles[key] = { img: img, id: key };
+                }
+                
+                for (const key in assetPaths.characters) {
+                    const path = assetPaths.characters[key];
+                    const img = new Image();
+                    const imgElement = document.getElementById(`char-${key.toLowerCase()}`).querySelector('img');
+                    img.src = path;
+                    img.onload = onAssetLoad;
+                    img.onerror = () => {
+                        imgElement.style.display = 'none';
+                        errorHandler(img, path);
+                    };
+                    assets.characters[key] = img;
+                }
+            }
+
+            function onAssetLoad() {
+                assetsLoaded++;
+                if (assetsLoaded === totalAssets) {
+                    Object.values(assets.collectibles).forEach(collectible => {
+                        if (!collectible.img.placeholder) {
+                            const imgEl = document.createElement('img');
+                            imgEl.src = collectible.img.src;
+                            imgEl.id = `collectible-icon-${collectible.id}`;
+                            collectiblesDisplay.appendChild(imgEl);
+                        }
+                    });
+                }
+            }
+
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+            let player = {};
+            const playerInitialState = () => ({
+                w: canvas.width * 0.18,
+                h: canvas.width * 0.18,
+                x: canvas.width * 0.1,
+                y: canvas.height * 0.5,
+                vy: 0,
+                gravity: canvas.height * 0.0015,
+                jumpStrength: canvas.height * -0.030,
+                jumps: 0,
+                maxJumps: 2,
+                grounded: false,
+                currentFrame: 0,
+                frameSpeed: 5,
+            });
+
+            let platforms = [];
+            let collectibles = [];
+            let collectedItems = new Set();
+
+            let touchStartY = 0;
+            let touchEndY = 0;
+
+            function handleTouchStart(e) { touchStartY = e.changedTouches[0].screenY; }
+            function handleTouchEnd(e) {
+                touchEndY = e.changedTouches[0].screenY;
+                handleSwipe();
+            }
+            function handleSwipe() {
+                if (touchEndY < touchStartY - 50) {
+                    if (player.jumps < player.maxJumps) {
+                        player.vy = player.jumpStrength;
+                        player.jumps++;
+                        player.grounded = false;
+                    }
+                }
+            }
+            window.addEventListener('touchstart', handleTouchStart, false);
+            window.addEventListener('touchend', handleTouchEnd, false);
+            window.addEventListener('keydown', (e) => {
+                if (e.code === 'Space' && gameState === 'playing') {
+                    if (player.jumps < player.maxJumps) {
+                        player.vy = player.jumpStrength;
+                        player.jumps++;
+                        player.grounded = false;
+                    }
+                }
+            });
+
+            function generatePlatforms() {
+                platforms = platforms.filter(p => p.x + p.w > 0);
+                if (platforms.length === 0 || platforms[platforms.length - 1].x < canvas.width) {
+                    const lastPlatform = platforms[platforms.length - 1];
+                    const minGap = canvas.width * 0.25; 
+                    const maxGap = canvas.width * 0.50; 
+                    const newPlatform = {
+                        w: canvas.width * (Math.random() * 0.35 + 0.30),
+                        h: canvas.height * 0.03,
+                        x: lastPlatform ? lastPlatform.x + lastPlatform.w + (Math.random() * (maxGap - minGap) + minGap) : canvas.width,
+                        y: canvas.height * (Math.random() * 0.4 + 0.55)
+                    };
+                    platforms.push(newPlatform);
+                    generateCollectible(newPlatform);
+                }
+            }
+            
+            function generateCollectible(platform) {
+                if (Math.random() > 0.8) { 
+                    const availableCollectibles = Object.values(assets.collectibles).filter(c => !collectedItems.has(c.id));
+                    if(availableCollectibles.length > 0) {
+                        const collectibleData = availableCollectibles[Math.floor(Math.random() * availableCollectibles.length)];
+                        const size = canvas.width * 0.18;
+                        collectibles.push({
+                            id: collectibleData.id,
+                            img: collectibleData.img,
+                            x: platform.x + platform.w / 2 - size / 2,
+                            y: platform.y - size * 1.5,
+                            w: size, h: size,
+                        });
+                    }
+                }
+            }
+
+            const backgroundLayers = [
+                { speedModifier: 0.1, color: '#a9d6e5', objects: [] },
+                { speedModifier: 0.3, color: '#61a5c2', objects: [] },
+                { speedModifier: 0.5, color: '#2c7da0', objects: [] },
+            ];
+
+            function generateBackgroundObjects() {
+                backgroundLayers.forEach(layer => {
+                    layer.objects = [];
+                    for(let i=0; i < 10; i++){
+                        layer.objects.push({
+                            x: Math.random() * canvas.width * 2,
+                            y: canvas.height * (Math.random() * 0.4 + 0.3),
+                            size: Math.random() * 50 + 20
+                        });
+                    }
+                });
+            }
+
+            function drawBackground() {
+                const sky = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                sky.addColorStop(0, '#75aadb');
+                sky.addColorStop(1, '#e9e1d5');
+                ctx.fillStyle = sky;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.fillStyle = 'rgba(255, 255, 224, 0.8)';
+                ctx.beginPath();
+                ctx.arc(canvas.width * 0.8, canvas.height * 0.15, canvas.width * 0.08, 0, Math.PI * 2);
+                ctx.fill();
+
+                backgroundLayers.forEach(layer => {
+                    ctx.fillStyle = layer.color;
+                    layer.objects.forEach(obj => {
+                        obj.x -= gameSpeed * layer.speedModifier;
+                        if (obj.x + obj.size * 2 < 0) {
+                            obj.x = canvas.width + Math.random() * 50;
+                        }
+                        ctx.beginPath();
+                        ctx.ellipse(obj.x, obj.y, obj.size * 2, obj.size, 0, 0, Math.PI * 2);
+                        ctx.fill();
+                    });
+                });
+            }
+
+            function update() {
+                if (gameState !== 'playing') return;
+                
+                frameCount++;
+                gameSpeed = canvas.width * 0.006 + (score / 5000);
+                score += Math.floor(gameSpeed);
+
+                player.vy += player.gravity;
+                player.y += player.vy;
+                player.grounded = false;
+
+                if (frameCount % player.frameSpeed === 0) {
+                    player.currentFrame = (player.currentFrame + 1) % assets.playerFrames.length;
+                }
+                
+                generatePlatforms();
+                platforms.forEach(p => p.x -= gameSpeed);
+                
+                collectibles.forEach(c => c.x -= gameSpeed);
+                collectibles = collectibles.filter(c => c.x + c.w > 0);
+
+                platforms.forEach(p => {
+                    if (player.x < p.x + p.w && player.x + player.w > p.x &&
+                        player.y + player.h > p.y && player.y + player.h < p.y + p.h + player.vy &&
+                        player.vy > 0) {
+                        player.y = p.y - player.h;
+                        player.vy = 0;
+                        player.jumps = 0;
+                        player.grounded = true;
+                    }
+                });
+
+                collectibles.forEach((c, index) => {
+                    if (player.x < c.x + c.w && player.x + player.w > c.x &&
+                        player.y < c.y + c.h && player.y + player.h > c.y) {
+                        collectedItems.add(c.id);
+                        collectibles.splice(index, 1);
+                        updateCollectiblesUI();
+                        if (collectedItems.size === Object.keys(assets.collectibles).length) {
+                            switchState('win');
+                        }
+                    }
+                });
+
+                if (player.y > canvas.height) {
+                    switchState('gameOver');
+                }
+            }
+
+            function draw() {
+                if (gameState !== 'playing') return;
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawBackground();
+                
+                ctx.fillStyle = '#8B4513';
+                platforms.forEach(p => {
+                    ctx.fillRect(p.x, p.y, p.w, p.h);
+                });
+
+                collectibles.forEach(c => {
+                    if (c.img.placeholder) {
+                        ctx.fillStyle = 'gold';
+                        ctx.fillRect(c.x, c.y, c.w, c.h);
+                    } else {
+                        ctx.drawImage(c.img, c.x, c.y, c.w, c.h);
+                    }
+                });
+                
+                const playerImg = assets.playerFrames[player.currentFrame];
+                if (playerImg && playerImg.placeholder) {
+                    ctx.fillStyle = 'purple';
+                    ctx.fillRect(player.x, player.y, player.w, player.h);
+                } else if (playerImg) {
+                    ctx.drawImage(playerImg, player.x, player.y, player.w, player.h);
+                }
+            }
+
+            function switchState(newState) {
+                gameState = newState;
+                startScreen.classList.add('hidden');
+                gameContainer.classList.add('hidden');
+                gameOverScreen.classList.add('hidden');
+                winScreen.classList.add('hidden');
+
+                switch (newState) {
+                    case 'start':
+                        startScreen.classList.remove('hidden');
+                        break;
+                    case 'playing':
+                        gameContainer.classList.remove('hidden');
+                        resetGame();
+                        gameLoop();
+                        break;
+                    case 'gameOver':
+                        gameOverScreen.classList.remove('hidden');
+                        break;
+                    case 'win':
+                        winScreen.classList.remove('hidden');
+                        setupCalendar();
+                        break;
+                }
+            }
+            
+            function gameLoop() {
+                if (gameState !== 'playing') return;
+                update();
+                draw();
+                requestAnimationFrame(gameLoop);
+            }
+
+            function resetGame() {
+                player = playerInitialState();
+                platforms = [{ x: 0, y: canvas.height * 0.8, w: canvas.width * 1.2, h: canvas.height * 0.2 }];
+                collectibles = [];
+                collectedItems.clear();
+                score = 0;
+                frameCount = 0;
+                gameSpeed = canvas.width * 0.006;
+                updateCollectiblesUI();
+                generateBackgroundObjects();
+            }
+            
+            function updateCollectiblesUI() {
+                Object.keys(assetPaths.collectibles).forEach(id => {
+                    const icon = document.getElementById(`collectible-icon-${id}`);
+                    if (icon) {
+                        icon.classList.toggle('collected', collectedItems.has(id));
+                    }
+                });
+            }
+
+            function setupCalendar() {
+                const daySelect = document.getElementById('day-select');
+                const monthSelect = document.getElementById('month-select');
+                const yearSelect = document.getElementById('year-select');
+                daySelect.innerHTML = ''; monthSelect.innerHTML = ''; yearSelect.innerHTML = '';
+                for(let i=1; i<=31; i++) daySelect.add(new Option(i,i));
+                const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+                months.forEach((m, i) => monthSelect.add(new Option(m, i+1)));
+                const currentYear = new Date().getFullYear();
+                for(let i=currentYear; i<=currentYear+2; i++) yearSelect.add(new Option(i,i));
+                document.getElementById('confirm-date-button').onclick = () => {
+                    document.getElementById('confirmation-message').textContent = `¡Perfecto! Agendado para el ${daySelect.value} de ${months[monthSelect.value - 1]} de ${yearSelect.value}. ¡Nos vemos!`;
+                };
+            }
+            
+            charBuddy.addEventListener('click', () => {
+                selectedCharacter = 'Buddy';
+                charBuddy.classList.add('selected');
+                charPablo.classList.remove('selected');
+            });
+            charPablo.addEventListener('click', () => {
+                selectedCharacter = 'Pablo';
+                charPablo.classList.add('selected');
+                charBuddy.classList.remove('selected');
+            });
+            startButton.addEventListener('click', () => {
+                if(assetsLoaded >= totalAssets) {
+                   switchState('playing');
+                }
+            });
+            restartButton.addEventListener('click', () => switchState('playing'));
+            
+            loadAssets();
+        });
+    </script>
+</body>
+</html>
+
